@@ -1107,7 +1107,10 @@ class MainActivity : AppCompatActivity() {
                 try {
                     val ids = withContext(Dispatchers.IO) { Api.listModels(snap) }
                     say("Connected ✔  ${ids.size} models available.", true)
-                } catch (e: Exception) { say("Failed: ${e.message}. You can still type a model ID manually.", false) }
+                } catch (e: Exception) {
+                    StudioLog.add(this@MainActivity, "Provider connection", snap.name, snap.model, "ERROR", e.message.orEmpty())
+                    say("Failed: ${e.message}. You can still type a model ID manually.", false)
+                }
             }
         }, lp(0, dp(44), 1f).apply { marginEnd = dp(6) })
         b2.addView(btn("LOAD MODELS", C.GOLD) {
@@ -1126,7 +1129,10 @@ class MainActivity : AppCompatActivity() {
                     say("${ids.size} models loaded. Capabilities were guessed from model names — review the checkboxes.", true)
                     val shown = ids.take(300)
                     AlertDialog.Builder(this@MainActivity).setTitle("Choose chat model").setItems(shown.toTypedArray()) { _, w -> fModel.setText(shown[w]) }.show()
-                } catch (e: Exception) { say("Failed: ${e.message}", false) }
+                } catch (e: Exception) {
+                    StudioLog.add(this@MainActivity, "Load models", snap.name, snap.model, "ERROR", e.message.orEmpty())
+                    say("Failed: ${e.message}", false)
+                }
             }
         }, lp(0, dp(44), 1f))
         col.addView(b2, lp(MATCH, WRAP).apply { topMargin = dp(8) })
@@ -1145,6 +1151,7 @@ class MainActivity : AppCompatActivity() {
             }
         }, lp(MATCH, dp(44)).apply { topMargin = dp(8) })
         col.addView(btn("DIAGNOSTICS", C.BLUE) { diagnostics() }, lp(MATCH, dp(44)).apply { topMargin = dp(8) })
+        col.addView(btn("ERROR & HISTORY LOG", C.GOLD) { showStudioLogs() }, lp(MATCH, dp(44)).apply { topMargin = dp(8) })
 
         col.addView(View(this).apply { setBackgroundColor(C.DIV) }, lp(MATCH, dp(1)).apply { topMargin = dp(14); bottomMargin = dp(12) })
         val about = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; gravity = Gravity.CENTER_HORIZONTAL }
@@ -1156,6 +1163,18 @@ class MainActivity : AppCompatActivity() {
         about.addView(tv("POWERED BY I KO KO", 11f, C.GOLD, true).apply { setPadding(0, dp(6), 0, 0) })
         col.addView(about, lp(MATCH, WRAP))
         return sv
+    }
+
+    private fun showStudioLogs() {
+        val entries = StudioLog.entries(this)
+        val message = if (entries.isEmpty()) "No studio events have been recorded yet." else entries.take(30).joinToString("\n\n").take(9000)
+        AlertDialog.Builder(this).setTitle("ERROR & HISTORY LOG")
+            .setMessage(message)
+            .setNeutralButton("COPY") { _, _ -> copy(message) }
+            .setNegativeButton("CLEAR") { _, _ ->
+                confirm("Clear all saved error and history entries?") { StudioLog.clear(this); toast("Log cleared.") }
+            }
+            .setPositiveButton("CLOSE", null).show()
     }
 
     private fun diagnostics() {
