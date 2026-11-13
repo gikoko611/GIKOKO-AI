@@ -82,6 +82,7 @@ class AnimationStudioActivity : AppCompatActivity() {
         director = store.active(); coder = store.active(); reviewer = store.active()
         buildPage()
         loadRoles()
+        intent.getStringExtra("brief")?.let { prompt.setText(it) }
         showPreview()
     }
 
