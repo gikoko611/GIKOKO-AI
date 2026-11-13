@@ -309,6 +309,7 @@ class AnimationStudioActivity : AppCompatActivity() {
         }
     }
 
+    // Export the generated HTML through Android's Storage Access Framework.
     private fun saveHtml() {
         val source = html.text.toString().trim()
         if (source.isBlank()) { toast("There is no HTML to save."); return }
