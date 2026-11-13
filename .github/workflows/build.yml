@@ -9,9 +9,14 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: gikoko-ai-android-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -23,7 +28,12 @@ jobs:
           java-version: '17'
 
       - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
+        uses: android-actions/setup-android@v4
+        with:
+          packages: platform-tools
+
+      - name: Install required Android SDK packages
+        run: sdkmanager "platforms;android-34" "build-tools;34.0.0"
 
       - name: Set up Gradle 8.5 (with dependency cache)
         uses: gradle/actions/setup-gradle@v4
@@ -37,17 +47,20 @@ jobs:
         run: gradle assembleDebug assembleRelease --no-daemon --stacktrace
 
       - name: Verify APK contents
+        shell: bash
         run: |
-          set -e
+          set -euo pipefail
           mkdir -p dist
           cp app/build/outputs/apk/debug/app-debug.apk dist/GIKOKOAI-debug.apk
           cp app/build/outputs/apk/release/app-release.apk dist/GIKOKOAI-release.apk
           for f in dist/*.apk; do
-            echo "== $f"; ls -l "$f"
-            unzip -l "$f" | grep -E "classes.dex|AndroidManifest.xml" 
-            echo "Native libs:"; unzip -l "$f" | grep "lib/" || echo "none (pure Kotlin/Java - runs on armeabi-v7a and arm64-v8a)"
+            echo "== $f"
+            ls -lh "$f"
+            unzip -l "$f" | grep -E "classes.dex|AndroidManifest.xml"
+            echo "Native libraries:"
+            unzip -l "$f" | grep "lib/" || echo "No native libraries (Kotlin/Java app)"
           done
-          $ANDROID_HOME/build-tools/$(ls $ANDROID_HOME/build-tools | sort -V | tail -1)/aapt dump badging dist/GIKOKOAI-debug.apk | grep -E "package:|native-code|sdkVersion" || true
+          "$ANDROID_HOME/build-tools/34.0.0/aapt" dump badging dist/GIKOKOAI-debug.apk | grep -E "package:|sdkVersion|targetSdkVersion"
 
       - name: Upload APK artifacts
         uses: actions/upload-artifact@v4
@@ -55,6 +68,7 @@ jobs:
           name: GIKOKOAI-apk
           path: dist/*.apk
           if-no-files-found: error
+          retention-days: 14
 
       - name: Create GitHub Release (tags only)
         if: startsWith(github.ref, 'refs/tags/v')
