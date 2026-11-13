@@ -41,7 +41,7 @@ jobs:
           gradle-version: '8.5'
 
       - name: Unit tests
-        run: gradle testDebugUnitTest --no-daemon --stacktrace
+        run: gradle clean testDebugUnitTest lintDebug --no-daemon --stacktrace
 
       - name: Build debug + release APK
         run: gradle assembleDebug assembleRelease --no-daemon --stacktrace
