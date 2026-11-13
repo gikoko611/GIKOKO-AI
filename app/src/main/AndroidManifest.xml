@@ -11,6 +11,10 @@
         android:usesCleartextTraffic="false">
 
         <activity
+            android:name=".AnimationStudioActivity"
+            android:exported="false"
+            android:screenOrientation="unspecified" />
+        <activity
             android:name=".StudioActivity"
             android:exported="false"
             android:screenOrientation="unspecified" />
