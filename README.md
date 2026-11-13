@@ -17,6 +17,6 @@ Streaming chat + Markdown/code highlight, provider manager (Keystore-encrypted k
 image generation, text-to-speech, image/text attachments, sandboxed HTML preview, ZIP export, history (search/rename/delete),
 Files tab, SAF save, share, job states + restart recovery, stop/retry/regenerate/edit.
 
-## Not in this build (honest limits)
+## Phase 2 additions\n- Media Studio: local audio playback, provider-based speech-to-text using `/audio/transcriptions`, local video metadata inspection and first-frame preview, and PDF export with Unicode grapheme-aware line wrapping.\n- Open from the new STUDIO bottom navigation tab. Audio transcription requires an active OpenAI-compatible provider that supports the transcription endpoint and a compatible transcription model (default `whisper-1`). Video inspection and PDF creation work locally.\n\n## Not in this build (honest limits)
 Video generation/editing (FFmpeg/MediaCodec), speech-to-text, Lottie/Three.js engines, WorkManager background service,
 PDF generation. Video requests return a script + storyboard only. See roadmap in chat.

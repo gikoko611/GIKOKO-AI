@@ -2,7 +2,7 @@ name: Build G.I KO KO AI APK
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ main, master, 'phase2/**' ]
     tags: [ 'v*' ]
   workflow_dispatch:
 

@@ -214,9 +214,13 @@ class MainActivity : AppCompatActivity() {
         root.addView(content, lp(MATCH, 0, 1f))
 
         val nav = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL; setBackgroundColor(C.SURF) }
-        listOf("CHAT", "HISTORY", "FILES", "SETTINGS").forEachIndexed { i, n ->
-            val t = tv(n, 11f, C.TEXT2, true).apply {
-                gravity = Gravity.CENTER; setOnClickListener { show(i) }
+        listOf("CHAT", "HISTORY", "FILES", "SETTINGS", "STUDIO").forEachIndexed { i, n ->
+            val t = tv(n, 10f, C.TEXT2, true).apply {
+                gravity = Gravity.CENTER
+                setOnClickListener {
+                    if (i == 4) startActivity(Intent(this@MainActivity, StudioActivity::class.java))
+                    else show(i)
+                }
             }
             navViews.add(t)
             nav.addView(t, lp(0, dp(52), 1f))
