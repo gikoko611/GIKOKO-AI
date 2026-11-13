@@ -54,6 +54,7 @@ class AnimationStudioActivity : AppCompatActivity() {
     private var exportFile: File? = null
     private val running = AtomicBoolean(false)
     private val requestExport = 501
+    private val requestSaveHtml = 502
 
     private fun dp(v: Int) = (v * resources.displayMetrics.density).toInt()
     private fun text(s: String, size: Float = 13f, color: Int = C.TEXT, bold: Boolean = false) =
@@ -308,9 +309,29 @@ class AnimationStudioActivity : AppCompatActivity() {
         }
     }
 
+    private fun saveHtml() {
+        val source = html.text.toString().trim()
+        if (source.isBlank()) { toast("There is no HTML to save."); return }
+        val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).addCategory(Intent.CATEGORY_OPENABLE)
+            .setType("text/html").putExtra(Intent.EXTRA_TITLE, "GIKOKOAI-animation.html")
+        startActivityForResult(intent, requestSaveHtml)
+    }
+
     @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == requestSaveHtml && resultCode == Activity.RESULT_OK) {
+            val uri = data?.data ?: return
+            try {
+                contentResolver.openOutputStream(uri)?.use { it.write(html.text.toString().toByteArray(Charsets.UTF_8)) }
+                    ?: throw IllegalStateException("Cannot open selected destination.")
+                toast("HTML saved successfully.")
+                StudioLog.add(this, "HTML save", "", "", "SUCCESS", "HTML file exported.")
+            } catch (e: Exception) {
+                toast("HTML save failed: ${e.message}")
+                StudioLog.add(this, "HTML save", "", "", "ERROR", e.message.orEmpty())
+            }
+        }
         if (requestCode == requestExport && resultCode == Activity.RESULT_OK) {
             val uri = data?.data ?: return
             scope.launch {
