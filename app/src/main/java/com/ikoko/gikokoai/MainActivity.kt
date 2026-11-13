@@ -214,11 +214,12 @@ class MainActivity : AppCompatActivity() {
         root.addView(content, lp(MATCH, 0, 1f))
 
         val nav = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL; setBackgroundColor(C.SURF) }
-        listOf("CHAT", "HISTORY", "FILES", "SETTINGS", "STUDIO").forEachIndexed { i, n ->
+        listOf("CHAT", "HISTORY", "FILES", "SETTINGS", "STUDIO", "ANIMATE").forEachIndexed { i, n ->
             val t = tv(n, 10f, C.TEXT2, true).apply {
                 gravity = Gravity.CENTER
                 setOnClickListener {
                     if (i == 4) startActivity(Intent(this@MainActivity, StudioActivity::class.java))
+                    else if (i == 5) startActivity(Intent(this@MainActivity, AnimationStudioActivity::class.java))
                     else show(i)
                 }
             }
@@ -775,7 +776,7 @@ class MainActivity : AppCompatActivity() {
         when (kind) {
             "image" -> runMedia(p, true, stripped)
             "tts" -> runMedia(p, false, stripped)
-            "video" -> runChat(p, VIDEO_PROMPT, true)
+            "video" -> startActivity(Intent(this, AnimationStudioActivity::class.java).putExtra("brief", stripped))
             else -> runChat(p, null, false)
         }
     }
