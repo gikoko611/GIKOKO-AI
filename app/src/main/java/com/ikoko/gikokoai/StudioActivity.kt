@@ -156,6 +156,10 @@ class StudioActivity : AppCompatActivity() {
         when (requestCode) {
             101 -> { audioUri = uri; audioLabel?.text = displayName(uri) }
             102 -> { videoUri = uri; videoLabel?.text = displayName(uri) }
+            103 -> {
+                try { writePdf(uri, pendingPdfText); toast("PDF exported successfully.") }
+                catch (e: Exception) { toast("PDF export failed: ${e.message}") }
+            }
         }
     }
 
@@ -351,14 +355,6 @@ class StudioActivity : AppCompatActivity() {
         super.onDestroy()
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == 103 && resultCode == Activity.RESULT_OK) {
-            val uri = data?.data ?: return
-            try { writePdf(uri, pendingPdfText); toast("PDF exported successfully.") }
-            catch (e: Exception) { toast("PDF export failed: ${e.message}") }
-        }
-    }
 }
 
 internal object TranscriptParser {
