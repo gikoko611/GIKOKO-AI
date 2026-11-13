@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.GI" parent="Theme.AppCompat.NoActionBar">
+        <item name="android:windowBackground">@color/bg</item>
+        <item name="android:statusBarColor">@color/bg</item>
+        <item name="android:navigationBarColor">@color/bg</item>
+        <item name="colorAccent">@color/gold</item>
+        <item name="colorPrimary">@color/bg</item>
+    </style>
+    <style name="Theme.GI.Splash" parent="Theme.GI">
+        <item name="android:windowBackground">@drawable/splash</item>
+    </style>
+</resources>
